@@ -15,6 +15,8 @@ reportlab>=4.0.0
 
 # Vector DB & Hybrid Search
 qdrant-client>=1.11.0
+fastembed>=0.9.1
+rank-bm25>=0.2.2
 
 # Caching & State Management
 redis>=5.0.0

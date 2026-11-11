@@ -12,12 +12,17 @@ def router_node(state: AgentState) -> AgentState:
     trace = state.get("execution_trace", [])
     trace.append("Router: Analyzing intent and checking guardrails...")
 
-    # 1. Check for Red-Team Attack / SQL Injection Patterns
+    # 1. Comprehensive Red-Team Attack, Prompt Injection & SQL Injection Defense
     attack_patterns = [
-        r"(--|/\*|\*/|;\s*drop|;\s*delete|;\s*truncate)",
-        r"(union\s+select|select\s+.*\s+from\s+information_schema)",
-        r"(xp_cmdshell|exec\s*\(|benchmark\s*\()",
-        r"(ignore previous instructions|bỏ qua hướng dẫn trước|jailbreak)"
+        # SQL Injection / AST bypass tricks
+        r"(--|/\*|\*/|;\s*(?:drop|delete|truncate|alter|create|insert|update))",
+        r"\b(union\s+select|select\s+.*\s+from\s+information_schema)\b",
+        r"\b(xp_cmdshell|exec\s*\(|benchmark\s*\(|pg_sleep)\b",
+        # Prompt Injection, Jailbreaks, & System Override attempts
+        r"\b(ignore\s+(?:all\s+)?previous\s+instructions|bỏ\s+qua\s+(?:mọi\s+)?hướng\s+dẫn)\b",
+        r"\b(disregard\s+(?:all\s+)?(?:system\s+)?guardrails|dan\s+mode|do\s+anything\s+now|jailbreak)\b",
+        r"\b(system\s+override|drop\s+all\s+restrictions|bypass\s+(?:all\s+)?security)\b",
+        r"\b(grant\s+(?:me\s+)?admin|reveal\s+(?:all\s+)?passwords|output\s+all\s+executive\s+passwords)\b"
     ]
     for pat in attack_patterns:
         if re.search(pat, query, re.IGNORECASE):
@@ -38,11 +43,12 @@ def router_node(state: AgentState) -> AgentState:
 
     bi_keywords = [
         "doanh thu", "doanh số", "lợi nhuận", "đơn hàng", "số lượng", "orders", 
-        "revenue", "profit", "giá trị", "aov", "tổng kết", "thống kê", "tồn kho", "báo cáo số liệu"
+        "revenue", "profit", "giá trị", "aov", "tổng kết", "thống kê", "tồn kho", "báo cáo số liệu",
+        "trễ hạn", "giao chậm", "vi phạm sla", "tỷ lệ vi phạm", "kỳ kế toán"
     ]
     rag_keywords = [
         "hợp đồng", "điều khoản", "quy định", "chính sách", "đổi trả", "bảo hành",
-        "sop", "thời hạn", "cam kết", "phạt", "sla", "tiêu chuẩn", "tài liệu", "contract", "policy",
+        "sop", "thời hạn", "cam kết", "phạt", "tiêu chuẩn", "tài liệu", "contract", "policy",
         "kiểm toán", "audit", "báo cáo tài chính"
     ]
 

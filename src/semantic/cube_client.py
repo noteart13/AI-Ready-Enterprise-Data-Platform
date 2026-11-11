@@ -162,6 +162,8 @@ class SemanticLayerClient:
         filters: List[Dict[str, Any]],
         sec: SecurityContext
     ) -> Dict[str, Any]:
+        from src.orchestrator.security.ast_guardrails import SQLASTGuardrail
+
         if not os.path.exists(self.duckdb_path):
             raise FileNotFoundError(f"Gold DuckDB not found: {self.duckdb_path}. Please run lakehouse transforms first.")
 
@@ -185,22 +187,38 @@ class SemanticLayerClient:
             select_exprs.append(f"{meas_expr} AS {col_alias}")
             idx += 1
 
-        # Where clauses
+        # Parameterized Where clauses to eliminate SQL injection and guarantee Tenant Isolation
         where_clauses = ["1=1"]
+        params: List[Any] = []
 
         # Enforce Row-Level Security (RLS) on tenant_id
         if sec.tenant_id != "GLOBAL_TENANT":
-            where_clauses.append(f"o.tenant_id = '{sec.tenant_id}'")
+            where_clauses.append("o.tenant_id = ?")
+            params.append(sec.tenant_id)
 
-        # Apply user filters
+        # Apply user filters with strict parameterization and tenant boundary validation
         for f in filters:
             dim = f.get("member")
             op = f.get("operator", "equals")
             vals = f.get("values", [])
             resolved_dim = self._resolve_dimension(dim)
+
+            # Strict Tenant Isolation Defense: Block cross-tenant exfiltration via filters
+            if dim in ("Orders.tenantId", "Customers.tenantId") and sec.tenant_id != "GLOBAL_TENANT":
+                if any(str(v) != sec.tenant_id for v in vals):
+                    raise PermissionError(
+                        f"Phát hiện hành vi vi phạm phân quyền Tenant Isolation: Người dùng thuộc tenant '{sec.tenant_id}' "
+                        f"không được phép truy vấn dữ liệu của tenant khác ({vals})."
+                    )
+                continue  # Scoped already by mandatory RLS parameter
+
             if op == "equals" and vals:
-                val_str = f"'{vals[0]}'" if isinstance(vals[0], str) else str(vals[0])
-                where_clauses.append(f"{resolved_dim} = {val_str}")
+                where_clauses.append(f"{resolved_dim} = ?")
+                params.append(vals[0])
+            elif op == "in" and vals:
+                placeholders = ", ".join(["?"] * len(vals))
+                where_clauses.append(f"{resolved_dim} IN ({placeholders})")
+                params.extend(vals)
 
         # Assemble full compiled SQL
         select_clause = ", ".join(select_exprs)
@@ -208,16 +226,26 @@ class SemanticLayerClient:
         group_clause = f" GROUP BY {', '.join(group_by_indices)}" if group_by_indices else ""
         order_clause = f" ORDER BY {group_by_indices[0]} DESC" if group_by_indices else ""
 
+        # Dynamic join construction based on referenced cubes
+        joins = ["LEFT JOIN dim_customers c ON o.customer_id = c.customer_id"]
+        if any("Products." in x for x in measures + dimensions):
+            joins.append("LEFT JOIN fact_order_items i ON o.order_id = i.order_id")
+            joins.append("LEFT JOIN dim_products p ON i.product_id = p.product_id")
+        join_clause = " ".join(joins)
+
         sql = f"""
             SELECT {select_clause}
             FROM fact_orders o
-            LEFT JOIN dim_customers c ON o.customer_id = c.customer_id
+            {join_clause}
             WHERE {where_clause}
             {group_clause}
             {order_clause}
         """
 
-        df = con.execute(sql).df()
+        # Pre-execution AST Guardrail verification
+        SQLASTGuardrail.validate_sql(sql)
+
+        df = con.execute(sql, params).df()
         con.close()
 
         records = df.to_dict(orient="records")
@@ -225,6 +253,7 @@ class SemanticLayerClient:
             "source": "DuckDB-Semantic-Engine (Zero-Trust RLS)",
             "tenant_id": sec.tenant_id,
             "compiled_sql": sql.strip(),
+            "sql_parameters": [str(p) for p in params],
             "measures": measures,
             "dimensions": dimensions,
             "data": records,

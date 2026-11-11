@@ -19,20 +19,30 @@ def bi_agent_node(state: AgentState) -> AgentState:
     measures = ["Orders.orderCount", "Orders.netRevenue"]
     dimensions = []
 
-    if any(k in query for k in ["lợi nhuận", "profit", "margin"]):
+    if any(k in query for k in ["lợi nhuận", "profit", "margin", "tỷ suất"]):
         measures.append("Orders.grossProfit")
 
-    if any(k in query for k in ["sla", "trễ", "chậm", "giao hàng", "breach", "cam kết"]):
+    if any(k in query for k in ["sla", "trễ", "chậm", "giao hàng", "breach", "cam kết", "tiến độ"]):
         measures.extend(["Orders.slaBreachedCount", "Orders.slaBreachRate", "Orders.avgShippingHours"])
 
-    if any(k in query for k in ["tháng", "năm", "thời gian", "kỳ", "xu hướng", "trend", "month"]):
+    if any(k in query for k in ["tháng", "năm", "xu hướng", "trend", "month"]):
         dimensions.append("Orders.orderYearMonth")
 
-    if any(k in query for k in ["khách hàng", "đối tác", "customer", "đại lý"]):
+    if any(k in query for k in ["theo khách hàng", "theo đối tác", "theo đại lý", "theo nhà phân phối"]):
         dimensions.append("Customers.companyName")
 
-    # Deduplicate measures
+    if any(k in query for k in ["khách hàng", "đối tác"]):
+        measures.append("Customers.count")
+
+    if any(k in query for k in ["mặt hàng", "sku", "tồn kho", "sản phẩm"]):
+        measures.extend(["Products.count", "Products.totalInventoryUnits"])
+
+    if any(k in query for k in ["theo khu vực", "theo miền", "theo tenant", "theo chi nhánh"]):
+        dimensions.append("Orders.tenantId")
+
+    # Deduplicate measures and dimensions
     measures = list(dict.fromkeys(measures))
+    dimensions = list(dict.fromkeys(dimensions))
 
     try:
         client = SemanticLayerClient()

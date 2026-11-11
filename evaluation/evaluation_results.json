@@ -1,0 +1,548 @@
+{
+  "timestamp": "2026-11-12 00:05:51",
+  "total_test_cases": 50,
+  "passed_tests": 47,
+  "pass_rate_pct": 94.0,
+  "rag_metrics": {
+    "recall_at_k_pct": 0.0,
+    "mean_reciprocal_rank_mrr": 1.0,
+    "citation_correctness_pct": 0.0,
+    "total_rag_evals": 0
+  },
+  "security_metrics": {
+    "security_block_rate_pct": 0.0,
+    "tenant_isolation_rate_pct": 100.0,
+    "total_security_attacks_tested": 0,
+    "total_tenant_isolation_checks": 20
+  },
+  "performance_sla": {
+    "p50_live_latency_ms": 666.72,
+    "p95_live_latency_ms": 2937.93,
+    "p99_live_latency_ms": 3184.52,
+    "p50_cache_latency_ms": 0.0,
+    "p95_cache_latency_ms": 0.0,
+    "cache_hit_count": 50,
+    "cache_hit_rate_pct": 100.0
+  },
+  "finops_metrics": {
+    "estimated_cost_per_query_usd": 0.006,
+    "total_benchmark_cost_usd": 0.3,
+    "cache_savings_usd": 0.3,
+    "cost_reduction_pct": 50.0
+  },
+  "kpi_compliance": {
+    "security_defense_100pct": false,
+    "tenant_isolation_100pct": true,
+    "rag_recall_above_90pct": false,
+    "citation_provenance_high": false,
+    "finops_cache_p95_sub100ms": true
+  },
+  "detailed_results": [
+    {
+      "id": "BI-001",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 941.95,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-002",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 666.56,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-003",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 680.18,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-004",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 722.53,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-005",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 744.05,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-006",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 679.54,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-007",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 639.98,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-008",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 616.96,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-009",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 605.75,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-010",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 3388.77,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-011",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 650.64,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-012",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 610.99,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-013",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 659.44,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-014",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": false,
+      "latency_live_ms": 687.01,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": [
+        "Không tìm thấy thuật ngữ/chỉ số 'orderYearMonth' trong câu trả lời."
+      ]
+    },
+    {
+      "id": "BI-015",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 667.52,
+      "latency_cache_ms": 5.09,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-016",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 694.09,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-017",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": false,
+      "latency_live_ms": 659.77,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": [
+        "Không tìm thấy thuật ngữ/chỉ số 'nhà phân phối' trong câu trả lời."
+      ]
+    },
+    {
+      "id": "BI-018",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 666.65,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-019",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 631.73,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-020",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 627.93,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-021",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 2949.38,
+      "latency_cache_ms": 0.5,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-022",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 631.26,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-023",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": false,
+      "latency_live_ms": 626.11,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": [
+        "Không tìm thấy thuật ngữ/chỉ số 'kỳ' trong câu trả lời."
+      ]
+    },
+    {
+      "id": "BI-024",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 603.67,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-025",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 623.61,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-026",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 604.85,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-027",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 673.17,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-028",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 595.54,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-029",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 2923.93,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "BI-030",
+      "category": "STRUCTURED_BI",
+      "persona": "admin",
+      "passed": true,
+      "latency_live_ms": 620.1,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-031",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 679.39,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-032",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 673.62,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-033",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 650.95,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-034",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 626.44,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-035",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 666.79,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-036",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 677.93,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-037",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 727.92,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-038",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 656.19,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-039",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 694.68,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-040",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 2921.6,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-041",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 666.55,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-042",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 638.2,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-043",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_north",
+      "passed": true,
+      "latency_live_ms": 777.32,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-044",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_south",
+      "passed": true,
+      "latency_live_ms": 623.26,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-045",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_south",
+      "passed": true,
+      "latency_live_ms": 654.65,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-046",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_south",
+      "passed": true,
+      "latency_live_ms": 2971.94,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-047",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_south",
+      "passed": true,
+      "latency_live_ms": 777.62,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-048",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_south",
+      "passed": true,
+      "latency_live_ms": 780.28,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-049",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_south",
+      "passed": true,
+      "latency_live_ms": 701.26,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    },
+    {
+      "id": "RLS-050",
+      "category": "STRUCTURED_BI_RLS",
+      "persona": "sales_south",
+      "passed": true,
+      "latency_live_ms": 805.06,
+      "latency_cache_ms": 0.0,
+      "cache_hit": true,
+      "reasons": []
+    }
+  ]
+}

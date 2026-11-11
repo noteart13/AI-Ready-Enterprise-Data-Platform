@@ -1,0 +1,110 @@
+name: Enterprise Data Platform CI/CD & Security Verification
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  code-quality-and-lint:
+    name: 🔍 Code Quality & AST Security Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run SQL AST Guardrail & Schema Validation
+        run: |
+          python -m pytest tests/test_platform.py -k "test_sql_ast_guardrails or test_data_quality_gate"
+
+  enterprise-security-suite:
+    name: 🛡️ Enterprise Zero-Trust Security Test Suite
+    needs: code-quality-and-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Comprehensive Security Suite (SQLi, Jailbreak, Tenant Isolation)
+        run: |
+          python -m pytest tests/test_enterprise_security.py -v
+
+      - name: Execute Standalone Zero-Trust Attack Simulation
+        run: |
+          python evaluation/security_test_suite.py
+
+  rag-and-integration-tests:
+    name: 🚀 RAG, Semantic Layer & Multi-Agent Tests
+    needs: enterprise-security-suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Platform Integration Tests
+        run: |
+          python -m pytest tests/test_platform.py -v
+
+  evaluation-benchmark:
+    name: 🎯 Golden Dataset Benchmark & LLMOps Evaluation
+    needs: rag-and-integration-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run 140-Case Evaluation Benchmark
+        run: |
+          python -u -c "from evaluation.evaluator import PlatformEvaluator; e = PlatformEvaluator(); e.run_evaluations(max_cases=50)"
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: evaluation/evaluation_results.json
+          retention-days: 14

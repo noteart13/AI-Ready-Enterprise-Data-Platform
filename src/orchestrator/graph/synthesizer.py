@@ -8,6 +8,28 @@ from typing import List, Dict, Any
 from src.orchestrator.graph.state import AgentState
 
 
+COLUMN_TITLES = {
+    "netRevenue": "Doanh thu thuần (Doanh số bán hàng)",
+    "orderCount": "Tổng số lượng đơn hàng",
+    "grossProfit": "Lợi nhuận gộp",
+    "averageOrderValue": "Giá trị đơn hàng trung bình (AOV)",
+    "avgShippingHours": "Thời gian vận chuyển giao hàng trung bình",
+    "slaBreachedCount": "Số lượng đơn trễ hạn tiến độ (SLA Breached)",
+    "slaBreachRate": "Tỷ lệ vi phạm SLA giao hàng trễ (%)",
+    "tenantId": "Mã khu vực đối tác (Tenant)",
+    "orderYearMonth": "Kỳ thời gian tháng/năm xu hướng",
+    "companyName": "Tên nhà phân phối đối tác khách hàng",
+    "count": "Tổng số lượng đối tác khách hàng / mặt hàng SKU",
+    "totalInventoryUnits": "Tổng tồn kho khả dụng mặt hàng"
+}
+
+
+def format_metric_pair(col_name: str, val: Any) -> str:
+    short_k = col_name.split("_")[-1]
+    label = COLUMN_TITLES.get(short_k, short_k)
+    return f"**{label}** (`{short_k}`): `{val}`"
+
+
 def synthesizer_node(state: AgentState) -> AgentState:
     trace = state.get("execution_trace", [])
     intent = state.get("intent", "HYBRID_ANALYSIS")
@@ -32,9 +54,9 @@ def synthesizer_node(state: AgentState) -> AgentState:
             state["final_answer"] = "Hệ thống không tìm thấy bản ghi số liệu phù hợp với bộ lọc và phạm vi phân quyền của bạn."
         else:
             lines = [f"### 📊 Báo cáo Số liệu Kinh doanh Thống nhất (Tenant: {sec.tenant_id})", ""]
-            lines.append("Dữ liệu được tổng hợp chính xác từ **Semantic Layer (Single Source of Truth)**:")
+            lines.append("Dữ liệu được trích xuất chính xác từ **Semantic Layer (Single Source of Truth)**:")
             for idx, row in enumerate(bi_data[:10]):
-                row_str = " | ".join([f"**{k.split('_')[-1]}**: {v}" for k, v in row.items()])
+                row_str = " | ".join([format_metric_pair(k, v) for k, v in row.items()])
                 lines.append(f"- Bản ghi #{idx+1}: {row_str}")
             state["final_answer"] = "\n".join(lines)
 
@@ -64,8 +86,7 @@ def synthesizer_node(state: AgentState) -> AgentState:
             for row in bi_data[:5]:
                 details = []
                 for k, v in row.items():
-                    col_name = k.split("_")[-1]
-                    details.append(f"- **{col_name}**: {v}")
+                    details.append(f"- {format_metric_pair(k, v)}")
                 lines.append("\n".join(details))
         else:
             lines.append("- *Không có số liệu đơn hàng phát sinh trong kỳ.*")
