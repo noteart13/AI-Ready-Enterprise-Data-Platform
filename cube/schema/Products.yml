@@ -1,0 +1,43 @@
+cubes:
+  - name: Products
+    sql_table: dim_products
+
+    dimensions:
+      - name: productId
+        sql: product_id
+        type: string
+        primary_key: true
+
+      - name: sku
+        sql: sku
+        type: string
+
+      - name: productName
+        sql: product_name
+        type: string
+
+      - name: category
+        sql: category
+        type: string
+
+      - name: unitPrice
+        sql: unit_price
+        type: number
+
+      - name: unitCost
+        sql: unit_cost
+        type: number
+
+      - name: stockQuantity
+        sql: stock_quantity
+        type: number
+
+    measures:
+      - name: count
+        type: count
+        title: "Total SKUs"
+
+      - name: totalInventoryUnits
+        sql: stock_quantity
+        type: sum
+        title: "Total Units in Stock"

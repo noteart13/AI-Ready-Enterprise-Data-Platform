@@ -1,0 +1,37 @@
+cubes:
+  - name: SLAPerformance
+    sql_table: fact_sla_performance
+
+    dimensions:
+      - name: tenantId
+        sql: tenant_id
+        type: string
+
+      - name: customerId
+        sql: customer_id
+        type: string
+
+      - name: orderYearMonth
+        sql: order_year_month
+        type: string
+
+    measures:
+      - name: totalOrders
+        sql: total_orders
+        type: sum
+        title: "Total Orders Monitored"
+
+      - name: breachedOrders
+        sql: breached_orders
+        type: sum
+        title: "SLA Breaches"
+
+      - name: totalRevenue
+        sql: total_revenue
+        type: sum
+        title: "Total Monitored Revenue"
+
+      - name: complianceRate
+        sql: "100.0 - (SUM({breachedOrders}) * 100.0 / NULLIF(SUM({totalOrders}), 0))"
+        type: number
+        title: "SLA Compliance Rate (%)"

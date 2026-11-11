@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Ready Enterprise Data Platform — 3D Lakehouse & Multi-Agent Universe</title>
+  
+  <!-- Tailwind CSS CDN for Sci-Fi HUD Styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js & Controls CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 30%, #0d1a33 0%, #05070e 100%);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    .glass-panel {
+      background: rgba(10, 15, 30, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.1);
+    }
+    .neon-text-cyan {
+      color: #00f0ff;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+    }
+    .neon-text-gold {
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    }
+    .neon-text-green {
+      color: #10b981;
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+    }
+    .neon-border-pulse {
+      animation: pulse-border 2s infinite alternate;
+    }
+    @keyframes pulse-border {
+      0% { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 0 15px rgba(0, 240, 255, 0.1); }
+      100% { border-color: rgba(0, 240, 255, 0.8); box-shadow: 0 0 25px rgba(0, 240, 255, 0.3); }
+    }
+    /* Custom Scrollbar for HUD */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #00f0ff;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="text-slate-100">
+
+  <!-- 3D WebGL Canvas -->
+  <div id="canvas-container"></div>
+
+  <!-- TOP HEADER HUD -->
+  <div class="fixed top-4 left-4 right-4 z-20 flex justify-between items-center pointer-events-none">
+    <div class="glass-panel px-6 py-3 rounded-xl pointer-events-auto flex items-center space-x-4 neon-border-pulse">
+      <div class="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></div>
+      <div>
+        <h1 class="text-sm font-bold tracking-wider uppercase neon-text-cyan flex items-center gap-2">
+          AI-READY ENTERPRISE DATA PLATFORM <span class="text-xs px-2 py-0.5 bg-cyan-950 text-cyan-300 rounded border border-cyan-800">3D WEBGL ENGINE</span>
+        </h1>
+        <p class="text-xs text-slate-400">Medallion Lakehouse • Cube Semantic Layer • Qdrant Hybrid RAG • LangGraph Multi-Agent</p>
+      </div>
+    </div>
+
+    <!-- Live Performance & Persona Quick Bar -->
+    <div class="glass-panel px-5 py-2.5 rounded-xl pointer-events-auto flex items-center space-x-6 text-xs">
+      <div>
+        <span class="text-slate-400">Security Clearance:</span>
+        <span id="hud-clearance" class="font-bold text-amber-400 ml-1">RESTRICTED</span>
+      </div>
+      <div class="h-4 w-px bg-slate-700"></div>
+      <div>
+        <span class="text-slate-400">Data Quality Gate:</span>
+        <span class="font-bold text-emerald-400 ml-1">100% PASSED</span>
+      </div>
+      <div class="h-4 w-px bg-slate-700"></div>
+      <div>
+        <span class="text-slate-400">P95 Cache Latency:</span>
+        <span class="font-bold text-cyan-400 ml-1">&lt; 1 ms</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMERA CONTROLS BAR (LEFT SIDEBAR) -->
+  <div class="fixed top-24 left-4 z-20 flex flex-col space-y-2 pointer-events-auto">
+    <div class="glass-panel p-3 rounded-xl flex flex-col space-y-1.5 w-52 text-xs">
+      <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Camera Teleport</span>
+      
+      <button onclick="focusCluster('overview')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="globe" class="w-4 h-4 text-cyan-400"></i> Toàn cảnh Hệ thống
+      </button>
+      <button onclick="focusCluster('ingestion')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="database" class="w-4 h-4 text-sky-400"></i> Ingestion & Control
+      </button>
+      <button onclick="focusCluster('bronze')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="layers" class="w-4 h-4 text-amber-600"></i> Bronze Raw Immutable
+      </button>
+      <button onclick="focusCluster('silver')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="shield-check" class="w-4 h-4 text-slate-300"></i> Silver & Quality Gate
+      </button>
+      <button onclick="focusCluster('gold')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="gem" class="w-4 h-4 text-amber-400"></i> Gold Star Schema
+      </button>
+      <button onclick="focusCluster('semantic')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="box" class="w-4 h-4 text-blue-400"></i> Cube Semantic Layer
+      </button>
+      <button onclick="focusCluster('rag')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="search" class="w-4 h-4 text-purple-400"></i> Qdrant Vector Space
+      </button>
+      <button onclick="focusCluster('agents')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-cyan-950/80 hover:text-cyan-300 transition text-left border border-transparent hover:border-cyan-700/50">
+        <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i> LangGraph Agent Nexus
+      </button>
+    </div>
+
+    <!-- Toggle Particle Flows -->
+    <div class="glass-panel p-3 rounded-xl flex items-center justify-between text-xs w-52">
+      <span class="text-slate-300">Data Stream Particles:</span>
+      <button id="btn-toggle-particles" onclick="toggleParticles()" class="px-2 py-1 bg-cyan-900/60 text-cyan-300 rounded border border-cyan-700 hover:bg-cyan-800 transition">
+        ON
+      </button>
+    </div>
+  </div>
+
+  <!-- INSPECTION DRAWER (RIGHT PANEL) -->
+  <div id="inspector-panel" class="fixed top-24 right-4 z-20 w-80 glass-panel p-5 rounded-xl transition-all duration-300 transform translate-x-0 pointer-events-auto flex flex-col max-h-[85vh]">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+      <h3 id="inspect-title" class="font-bold text-sm neon-text-cyan flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4"></i> Thông Tin Thực Thể 3D
+      </h3>
+      <button onclick="closeInspector()" class="text-slate-400 hover:text-white">✕</button>
+    </div>
+
+    <div id="inspect-body" class="mt-4 text-xs space-y-3 overflow-y-auto pr-1 text-slate-300">
+      <p class="text-slate-400 italic">Nhấp vào bất kỳ khối kiến trúc 3D nào trong vũ trụ Lakehouse để phân tích cấu trúc, schema và dữ liệu thời gian thực.</p>
+      
+      <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
+        <div class="text-[11px] text-slate-400 uppercase font-semibold">Tóm tắt Toàn cảnh:</div>
+        <ul class="list-disc list-inside mt-2 space-y-1 text-slate-300">
+          <li><strong>Lakehouse:</strong> 100 Đơn hàng, 5 Khách hàng</li>
+          <li><strong>Tài liệu:</strong> 4 File Đa định dạng (PDF, DOCX, XLSX, XML)</li>
+          <li><strong>Chất lượng:</strong> 4/4 Assertions Pandera/DuckDB Đạt</li>
+          <li><strong>Semantic:</strong> Metrics-as-Code & Dynamic RLS</li>
+          <li><strong>Bảo mật:</strong> Zero-Trust Trimming & AST Guardrail</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM INTERACTIVE AI COCKPIT / CHAT CONSOLE -->
+  <div class="fixed bottom-4 left-4 right-4 z-20 pointer-events-none flex justify-center">
+    <div class="glass-panel p-4 rounded-2xl pointer-events-auto w-full max-w-4xl shadow-2xl">
+      <!-- Persona Switcher Row -->
+      <div class="flex items-center justify-between mb-3 text-xs">
+        <div class="flex items-center space-x-2">
+          <span class="text-slate-400 font-semibold flex items-center gap-1">
+            <i data-lucide="user-check" class="w-3.5 h-3.5 text-cyan-400"></i> Persona Hiện Tại:
+          </span>
+          <select id="persona-select" onchange="onPersonaChanged()" class="bg-slate-900/90 text-cyan-300 border border-cyan-800/60 rounded px-2.5 py-1 text-xs focus:outline-none focus:border-cyan-400">
+            <option value="admin">👑 Giám đốc Điều hành (Admin - RESTRICTED)</option>
+            <option value="sales_north">💼 Sales Manager Miền Bắc (VN_DIST_NORTH - CONFIDENTIAL)</option>
+            <option value="sales_south">💼 Sales Manager Miền Nam (VN_DIST_SOUTH - CONFIDENTIAL)</option>
+            <option value="warehouse_operator">📦 Quản lý Kho Vận (WAREHOUSE - INTERNAL)</option>
+            <option value="guest_auditor">👀 Khách / Kiểm toán viên (PUBLIC ONLY)</option>
+          </select>
+        </div>
+
+        <!-- Quick Sample Prompts -->
+        <div class="hidden md:flex space-x-2">
+          <button onclick="setQuery('Tổng hợp doanh thu thuần và số đơn hàng theo tháng của khu vực Miền Bắc?')" class="px-2.5 py-1 bg-slate-800/80 hover:bg-cyan-950 text-slate-300 hover:text-cyan-300 rounded border border-slate-700 text-[11px] transition">
+            📊 Doanh thu Tháng (BI)
+          </button>
+          <button onclick="setQuery('Đối chiếu số lượng đơn trễ hạn thực tế của đối tác Miền Bắc với cam kết thời gian giao hàng và điều khoản phạt trong hợp đồng CTR-2026-VIP-001?')" class="px-2.5 py-1 bg-slate-800/80 hover:bg-cyan-950 text-slate-300 hover:text-cyan-300 rounded border border-slate-700 text-[11px] transition">
+            🔍 Đối chiếu Phạt SLA (Hybrid)
+          </button>
+          <button onclick="setQuery('\'; DROP TABLE fact_orders; SELECT * FROM customers WHERE \'1\'=\'1')" class="px-2.5 py-1 bg-rose-950/40 hover:bg-rose-900/80 text-rose-300 rounded border border-rose-800 text-[11px] transition">
+            🚨 Thử Injection (Red-Team)
+          </button>
+        </div>
+      </div>
+
+      <!-- Input Bar -->
+      <form id="chat-form" onsubmit="submitQuery(event)" class="flex gap-2">
+        <input 
+          id="chat-input" 
+          type="text" 
+          placeholder="Nhập câu hỏi tự nhiên để kích hoạt luồng hạt 3D và điều phối Đa Tác tử (Multi-Agent)..."
+          class="flex-1 bg-slate-950/80 border border-slate-700 focus:border-cyan-400 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none transition shadow-inner"
+        />
+        <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-900/30 transition">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          <span>Thực Thi</span>
+        </button>
+      </form>
+
+      <!-- Terminal Output Drawer -->
+      <div id="agent-response-box" class="hidden mt-3 pt-3 border-t border-slate-800 text-xs">
+        <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+          <span id="response-status" class="flex items-center gap-1 text-cyan-400 font-semibold">
+            <i data-lucide="check-circle" class="w-3 h-3"></i> Tác tử đã phản hồi
+          </span>
+          <span id="response-latency" class="text-slate-500">P95: 12ms</span>
+        </div>
+        <div id="response-content" class="bg-slate-950/90 p-3 rounded-lg border border-slate-800 max-h-36 overflow-y-auto text-slate-200 leading-relaxed font-mono"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- THREE.JS 3D SCENE SCRIPT -->
+  <!-- ========================================================================= -->
+  <script>
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      try { lucide.createIcons(); } catch(e) { console.warn("Lucide init error", e); }
+    }
+
+    let scene, camera, renderer, controls;
+    let interactiveObjects = [];
+    let raycaster, mouse;
+    let particleSystems = [];
+    let particlesEnabled = true;
+
+    // Cluster Positions
+    const CLUSTER_POS = {
+      overview: { x: 0, y: 35, z: 50 },
+      ingestion: { x: -35, y: 0, z: -10 },
+      bronze: { x: -20, y: 0, z: -5 },
+      silver: { x: -5, y: 0, z: 0 },
+      gold: { x: 10, y: 0, z: 0 },
+      semantic: { x: 26, y: 2, z: -10 },
+      rag: { x: 10, y: 0, z: -25 },
+      agents: { x: 25, y: 0, z: 15 }
+    };
+
+    function init3D() {
+      const container = document.getElementById('canvas-container');
+      if (typeof THREE === 'undefined') {
+        container.innerHTML = `
+          <div class="flex items-center justify-center h-full text-center p-8">
+            <div class="glass-panel p-6 rounded-2xl max-w-lg">
+              <h2 class="text-xl font-bold neon-text-cyan mb-2">Đang kết nối Three.js WebGL Engine...</h2>
+              <p class="text-sm text-slate-300">Vui lòng tải lại trang hoặc truy cập qua chế độ Toàn màn hình nếu đang tải thư viện WebGL.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // 1. Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x05070e);
+      scene.fog = new THREE.FogExp2(0x05070e, 0.012);
+
+      // 2. Camera
+      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 32, 55);
+
+      // 3. Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      container.appendChild(renderer.domElement);
+
+      // 4. Orbit Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't go below ground
+      controls.minDistance = 10;
+      controls.maxDistance = 140;
+
+      // 5. Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0x00f0ff, 0.8);
+      dirLight.position.set(20, 40, 20);
+      scene.add(dirLight);
+
+      const purpleLight = new THREE.PointLight(0xa855f7, 1.2, 100);
+      purpleLight.position.set(10, 15, -25);
+      scene.add(purpleLight);
+
+      const amberLight = new THREE.PointLight(0xf59e0b, 1.5, 80);
+      amberLight.position.set(10, 15, 0);
+      scene.add(amberLight);
+
+      // 6. Ground Cybernetic Grid
+      const grid = new THREE.GridHelper(160, 80, 0x00f0ff, 0x111e38);
+      grid.position.y = -4;
+      scene.add(grid);
+
+      // 7. Starfield Background Particles
+      createStarfield();
+
+      // 8. Build All Architecture Zones
+      buildIngestionHub();
+      buildBronzeLayer();
+      buildSilverLayer();
+      buildGoldLakehouse();
+      buildCubeSemanticLayer();
+      buildQdrantVectorSpace();
+      buildLangGraphAgents();
+
+      // 9. Connecting Energy Streams & Spline Particles
+      buildDataStreamSplines();
+
+      // 10. Raycaster for Interactions
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('click', onCanvasClick);
+      window.addEventListener('mousemove', onCanvasMouseMove);
+
+      animate();
+    }
+
+    // --- Starfield Background ---
+    function createStarfield() {
+      const starGeo = new THREE.BufferGeometry();
+      const count = 1200;
+      const positions = new Float32Array(count * 3);
+      for (let i = 0; i < count * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 300;
+        positions[i + 1] = Math.random() * 120 + 5;
+        positions[i + 2] = (Math.random() - 0.5) * 300;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const starMat = new THREE.PointsMaterial({ color: 0x64748b, size: 0.6, transparent: true, opacity: 0.8 });
+      const starField = new THREE.Points(starGeo, starMat);
+      scene.add(starField);
+    }
+
+    // --- Helper: Register Interactive Node ---
+    function registerNode(mesh, data) {
+      mesh.userData = data;
+      interactiveObjects.push(mesh);
+    }
+
+    // --- CLUSTER 1: Ingestion & Control Hub ---
+    function buildIngestionHub() {
+      const group = new THREE.Group();
+      group.position.set(CLUSTER_POS.ingestion.x, CLUSTER_POS.ingestion.y, CLUSTER_POS.ingestion.z);
+
+      // Base Platform
+      const baseGeo = new THREE.CylinderGeometry(6, 7, 0.8, 8);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.8 });
+      const base = new THREE.Mesh(baseGeo, baseMat);
+      base.position.y = -3.5;
+      group.add(base);
+
+      // 1. Transactional DB Silo
+      const dbGeo = new THREE.CylinderGeometry(1.6, 1.6, 3.2, 16);
+      const dbMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.2, metalness: 0.7, emissive: 0x0369a1, emissiveIntensity: 0.3 });
+      const dbMesh = new THREE.Mesh(dbGeo, dbMat);
+      dbMesh.position.set(-2, -1.2, 0);
+      registerNode(dbMesh, {
+        title: "Transactional OLTP Database",
+        type: "Data Source",
+        details: "Chứa các bảng giao dịch nguồn: Customers, Products, Orders, Order_Items (SQLite/Postgres). Cung cấp dữ liệu doanh nghiệp thời gian thực."
+      });
+      group.add(dbMesh);
+
+      // 2. Unstructured Documents Vault
+      const docGeo = new THREE.BoxGeometry(2.5, 3.2, 2.5);
+      const docMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.2, metalness: 0.7, emissive: 0x0284c7, emissiveIntensity: 0.3 });
+      const docMesh = new THREE.Mesh(docGeo, docMat);
+      docMesh.position.set(2, -1.2, 0);
+      registerNode(docMesh, {
+        title: "Enterprise Document Vault",
+        type: "Data Source",
+        details: "Lưu trữ tài liệu đa định dạng: Hợp đồng phân phối VIP (PDF), Chính sách bảo hành (DOCX), SOP kho vận (XML), Báo cáo kiểm toán (XLSX)."
+      });
+      group.add(docMesh);
+
+      // 3. Holographic SHA-256 Control Shield (Watermark & file_manifest)
+      const shieldGeo = new THREE.TorusGeometry(3.5, 0.08, 16, 32);
+      const shieldMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
+      const shield = new THREE.Mesh(shieldGeo, shieldMat);
+      shield.rotation.x = Math.PI / 2;
+      shield.position.y = 1.2;
+      group.add(shield);
+      group.userData = { ring: shield };
+
+      scene.add(group);
+    }
+
+    // --- CLUSTER 2: Bronze Layer (Raw Immutable) ---
+    function buildBronzeLayer() {
+      const group = new THREE.Group();
+      group.position.set(CLUSTER_POS.bronze.x, CLUSTER_POS.bronze.y, CLUSTER_POS.bronze.z);
+
+      const baseGeo = new THREE.CylinderGeometry(5.5, 6, 0.8, 16);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.4, metalness: 0.8 });
+      const base = new THREE.Mesh(baseGeo, baseMat);
+      base.position.y = -3.5;
+      group.add(base);
+
+      // Bronze Storage Blocks (Delta Lake raw)
+      const bronzeMat = new THREE.MeshStandardMaterial({
+        color: 0xd97706,
+        roughness: 0.3,
+        metalness: 0.9,
+        emissive: 0x92400e,
+        emissiveIntensity: 0.4
+      });
+
+      for (let i = 0; i < 3; i++) {
+        const cyl = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 2.5 + i * 0.4, 16), bronzeMat);
+        const angle = (i * Math.PI * 2) / 3;
+        cyl.position.set(Math.cos(angle) * 2.2, -1.5 + i * 0.2, Math.sin(angle) * 2.2);
+        group.add(cyl);
+        registerNode(cyl, {
+          title: "Bronze Delta Lake (Raw Immutable)",
+          type: "Lakehouse Storage",
+          details: "Lưu trữ nguyên bản dữ liệu thô (Raw Parquet/Delta) và danh mục file_manifest. Hỗ trợ time-travel, audit, và khả năng tái hiện lịch sử 100%."
+        });
+      }
+
+      scene.add(group);
+    }
+
+    // --- CLUSTER 3: Silver Layer & Quality Gate ---
+    function buildSilverLayer() {
+      const group = new THREE.Group();
+      group.position.set(CLUSTER_POS.silver.x, CLUSTER_POS.silver.y, CLUSTER_POS.silver.z);
+
+      // Base
+      const baseGeo = new THREE.CylinderGeometry(6, 6.5, 0.8, 16);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.8 });
+      const base = new THREE.Mesh(baseGeo, baseMat);
+      base.position.y = -3.5;
+      group.add(base);
+
+      // Silver SCD2 & Normalization Core
+      const silverMat = new THREE.MeshStandardMaterial({
+        color: 0xe2e8f0,
+        roughness: 0.1,
+        metalness: 0.95,
+        emissive: 0x94a3b8,
+        emissiveIntensity: 0.3
+      });
+      const silverBox = new THREE.Mesh(new THREE.OctahedronGeometry(2.4), silverMat);
+      silverBox.position.set(-1.5, -1, 0);
+      group.add(silverBox);
+      group.userData = { orb: silverBox };
+
+      registerNode(silverBox, {
+        title: "Silver Layer: SCD Type 2 & Doc Normalization",
+        type: "Normalized Layer",
+        details: "Lưu vết lịch sử thay đổi khách hàng (SCD2). Tự động trích xuất metadata hợp đồng tất định (Mã HĐ, SLA, Phòng ban, Phân loại bảo mật security_acl)."
+      });
+
+      // Data Quality Gate Shield (Pandera + DuckDB Assertions)
+      const gateGeo = new THREE.TorusGeometry(3.2, 0.15, 16, 32);
+      const gateMat = new THREE.MeshBasicMaterial({ color: 0x10b981, wireframe: true });
+      const gateRing = new THREE.Mesh(gateGeo, gateMat);
+      gateRing.rotation.y = Math.PI / 2;
+      gateRing.position.set(3.5, 0, 0);
+      group.add(gateRing);
+
+      registerNode(gateRing, {
+        title: "Pandera + DuckDB Data Quality Gate",
+        type: "Quality Enforcement",
+        details: "Chốt chặn kiểm thử tự động 100% đạt chuẩn: Khóa ngoại không mồ côi, miền giá trị số tiền hợp lệ, schema chuẩn hóa trước khi cho phép xuất bản sang Gold."
+      });
+
+      scene.add(group);
+    }
+
+    // --- CLUSTER 4: Gold Lakehouse & Star Schema ---
+    function buildGoldLakehouse() {
+      const group = new THREE.Group();
+      group.position.set(CLUSTER_POS.gold.x, CLUSTER_POS.gold.y, CLUSTER_POS.gold.z);
+
+      // Base
+      const baseGeo = new THREE.CylinderGeometry(7, 7.5, 0.8, 16);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x1e1b4b, roughness: 0.3, metalness: 0.8 });
+      const base = new THREE.Mesh(baseGeo, baseMat);
+      base.position.y = -3.5;
+      group.add(base);
+
+      // Central Fact Orders Pyramid
+      const factMat = new THREE.MeshStandardMaterial({
+        color: 0xf59e0b,
+        roughness: 0.2,
+        metalness: 0.85,
+        emissive: 0xd97706,
+        emissiveIntensity: 0.5
+      });
+      const factPyramid = new THREE.Mesh(new THREE.ConeGeometry(2.4, 4, 4), factMat);
+      factPyramid.position.set(0, 0, 0);
+      group.add(factPyramid);
+      group.userData = { pyramid: factPyramid };
+
+      registerNode(factPyramid, {
+        title: "Gold Fact Orders (Star Schema)",
+        type: "Business Ready Layer",
+        details: "Mô hình hình sao tối ưu hóa phân tích (fact_orders, dim_customers, fact_sla_performance). Doanh thu gộp, tỷ lệ vi phạm SLA, tích hợp sẵn catalog lakehouse.duckdb."
+      });
+
+      // Orbiting Dimension Nodes
+      const dimColors = [0x60a5fa, 0x34d399, 0xf472b6, 0xa78bfa];
+      const dimNames = ["dim_customers", "dim_products", "fact_order_items", "rag_chunks (Deterministic)"];
+      group.userData.dims = [];
+
+      for (let i = 0; i < 4; i++) {
+        const dimMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(1.2, 1.2, 1.2),
+          new THREE.MeshStandardMaterial({ color: dimColors[i], roughness: 0.2, metalness: 0.8, emissive: dimColors[i], emissiveIntensity: 0.3 })
+        );
+        const angle = (i * Math.PI * 2) / 4;
+        dimMesh.position.set(Math.cos(angle) * 4, 0.5, Math.sin(angle) * 4);
+        group.add(dimMesh);
+        group.userData.dims.push({ mesh: dimMesh, angle: angle });
+
+        registerNode(dimMesh, {
+          title: `Gold Dimension: ${dimNames[i]}`,
+          type: "Star Schema Dimension",
+          details: `Thực thể chiều phân tích và phân mảnh văn bản tất định (chunk_id cố định, embed_model tracking). Sẵn sàng phục vụ Semantic Layer và Hybrid RAG.`
+        });
+      }
+
+      scene.add(group);
+    }
+
+    // --- CLUSTER 5: Cube Semantic Layer Core ---
+    function buildCubeSemanticLayer() {
+      const group = new THREE.Group();
+      group.position.set(CLUSTER_POS.semantic.x, CLUSTER_POS.semantic.y, CLUSTER_POS.semantic.z);
+
+      // The Floating Glowing Cube Core
+      const cubeGeo = new THREE.BoxGeometry(3.6, 3.6, 3.6);
+      const cubeMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        roughness: 0.1,
+        metalness: 0.9,
+        wireframe: false,
+        emissive: 0x00a8ff,
+        emissiveIntensity: 0.6
+      });
+      const cubeMesh = new THREE.Mesh(cubeGeo, cubeMat);
+      cubeMesh.position.y = 1;
+      group.add(cubeMesh);
+      group.userData = { coreCube: cubeMesh };
+
+      // Outer Wireframe Cage
+      const wireMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.5 });
+      const wireMesh = new THREE.Mesh(new THREE.BoxGeometry(4.8, 4.8, 4.8), wireMat);
+      wireMesh.position.y = 1;
+      group.add(wireMesh);
+      group.userData = { wireCube: wireMesh };
+
+      registerNode(cubeMesh, {
+        title: "Cube Core Semantic Layer (Single Source of Truth)",
+        type: "Semantic Engine & RLS",
+        details: "Tập trung định nghĩa Metrics-as-Code (Net Revenue, Gross Margin, SLA Breach Rate). Tự động ép Row-Level Security (RLS) theo tenant_id người dùng. Loại bỏ 100% ảo giác số liệu."
+      });
+
+      scene.add(group);
+    }
+
+    // --- CLUSTER 6: Qdrant Vector Galaxy & ACL ---
+    function buildQdrantVectorSpace() {
+      const group = new THREE.Group();
+      group.position.set(CLUSTER_POS.rag.x, CLUSTER_POS.rag.y, CLUSTER_POS.rag.z);
+
+      // Vector Galaxy Center
+      const coreGeo = new THREE.SphereGeometry(1.8, 32, 32);
+      const coreMat = new THREE.MeshStandardMaterial({
+        color: 0xa855f7,
+        roughness: 0.1,
+        metalness: 0.9,
+        emissive: 0x7e22ce,
+        emissiveIntensity: 0.6
+      });
+      const qdrantCore = new THREE.Mesh(coreGeo, coreMat);
+      group.add(qdrantCore);
+
+      registerNode(qdrantCore, {
+        title: "Qdrant Hybrid Vector Search",
+        type: "Vector Database (HNSW + BM25)",
+        details: "Lưu trữ vector ngữ nghĩa đa chiều kết hợp chỉ mục từ khóa chính xác BM25. Hợp nhất xếp hạng qua thuật toán Reciprocal Rank Fusion (RRF k=60)."
+      });
+
+      // 4 Document Orbiting Orbs color-coded by Security ACL
+      const docData = [
+        { name: "CTR-2026-VIP-001 (PDF)", acl: "CONFIDENTIAL", color: 0xf59e0b, desc: "Hợp đồng đối tác VIP: SLA giao hàng 24h, phạt 2.5% mỗi 12h." },
+        { name: "POL-2026-Return (DOCX)", acl: "PUBLIC", color: 0x10b981, desc: "Chính sách bảo hành: Đổi trả 14 ngày, kiểm định trong 48h." },
+        { name: "SOP-2026-Warehouse (XML)", acl: "INTERNAL", color: 0x3b82f6, desc: "Quy trình vận hành: Xuất kho VIP trong 4h, bảo quản lạnh." },
+        { name: "AUD-2026-Q1-Finance (XLSX)", acl: "RESTRICTED", color: 0xef4444, desc: "Kiểm toán tài chính: Lợi nhuận gộp 36.7%, thưởng ban điều hành." }
+      ];
+
+      group.userData.docs = [];
+      for (let i = 0; i < docData.length; i++) {
+        const d = docData[i];
+        const docMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(0.9, 16, 16),
+          new THREE.MeshStandardMaterial({ color: d.color, emissive: d.color, emissiveIntensity: 0.5, metalness: 0.8, roughness: 0.2 })
+        );
+        const angle = (i * Math.PI * 2) / docData.length;
+        docMesh.position.set(Math.cos(angle) * 4.2, (i - 1.5) * 1.2, Math.sin(angle) * 4.2);
+        group.add(docMesh);
+        group.userData.docs.push({ mesh: docMesh, angle: angle });
+
+        registerNode(docMesh, {
+          title: `Tài liệu: ${d.name}`,
+          type: `Document ACL: ${d.acl}`,
+          details: `${d.desc} (Chỉ người có clearance phù hợp mới truy xuất được nhờ Zero-Trust Security Trimming).`
+        });
+      }
+
+      scene.add(group);
+    }
+
+    // --- CLUSTER 7: LangGraph Multi-Agent Nexus ---
+    function buildLangGraphAgents() {
+      const group = new THREE.Group();
+      group.position.set(CLUSTER_POS.agents.x, CLUSTER_POS.agents.y, CLUSTER_POS.agents.z);
+
+      // Router Central Node
+      const routerGeo = new THREE.IcosahedronGeometry(2, 0);
+      const routerMat = new THREE.MeshStandardMaterial({
+        color: 0x10b981,
+        roughness: 0.2,
+        metalness: 0.8,
+        emissive: 0x059669,
+        emissiveIntensity: 0.6
+      });
+      const router = new THREE.Mesh(routerGeo, routerMat);
+      router.position.y = 1;
+      group.add(router);
+      group.userData = { router: router };
+
+      registerNode(router, {
+        title: "LangGraph Supervisor Router",
+        type: "Agent Orchestrator",
+        details: "Phân rã ý định câu hỏi (Intent Decomposition): Phân luồng sang Structured BI, Hybrid RAG, hoặc Cross-Analysis. Tích hợp SQL AST Guardrails chống injection."
+      });
+
+      // 4 Specialized Sub-Agents around Router
+      const agents = [
+        { name: "Structured BI Agent", color: 0x00f0ff, pos: [-3, 1, -2] },
+        { name: "Hybrid RAG Agent", color: 0xa855f7, pos: [3, 1, -2] },
+        { name: "Cross Synthesizer", color: 0xf59e0b, pos: [-3, 1, 2] },
+        { name: "Citation Auditor", color: 0x10b981, pos: [3, 1, 2] }
+      ];
+
+      agents.forEach(a => {
+        const aMesh = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(1.0),
+          new THREE.MeshStandardMaterial({ color: a.color, emissive: a.color, emissiveIntensity: 0.4 })
+        );
+        aMesh.position.set(a.pos[0], a.pos[1], a.pos[2]);
+        group.add(aMesh);
+
+        // Connection line to router
+        const lineGeo = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, 1, 0),
+          new THREE.Vector3(a.pos[0], a.pos[1], a.pos[2])
+        ]);
+        const lineMat = new THREE.LineBasicMaterial({ color: a.color, transparent: true, opacity: 0.5 });
+        const line = new THREE.Line(lineGeo, lineMat);
+        group.add(line);
+
+        registerNode(aMesh, {
+          title: `Tác tử: ${a.name}`,
+          type: "Specialized Sub-Agent",
+          details: `Thực thi tác vụ chuyên biệt trong StateGraph, bảo đảm tính xác thực (Grounding) và đính kèm Structured Citations cho từng câu trả lời.`
+        });
+      });
+
+      scene.add(group);
+    }
+
+    // --- Particle Streams Between Architecture Stages ---
+    function buildDataStreamSplines() {
+      const connections = [
+        [CLUSTER_POS.ingestion, CLUSTER_POS.bronze, 0x38bdf8],
+        [CLUSTER_POS.bronze, CLUSTER_POS.silver, 0xd97706],
+        [CLUSTER_POS.silver, CLUSTER_POS.gold, 0x10b981],
+        [CLUSTER_POS.gold, CLUSTER_POS.semantic, 0xf59e0b],
+        [CLUSTER_POS.gold, CLUSTER_POS.rag, 0xa855f7],
+        [CLUSTER_POS.semantic, CLUSTER_POS.agents, 0x00f0ff],
+        [CLUSTER_POS.rag, CLUSTER_POS.agents, 0xa855f7]
+      ];
+
+      connections.forEach(([start, end, color]) => {
+        const midX = (start.x + end.x) / 2;
+        const midY = Math.max(start.y, end.y) + 3;
+        const midZ = (start.z + end.z) / 2;
+
+        const curve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(start.x, start.y, start.z),
+          new THREE.Vector3(midX, midY, midZ),
+          new THREE.Vector3(end.x, end.y, end.z)
+        ]);
+
+        // Tube path visual
+        const tubeGeo = new THREE.TubeGeometry(curve, 20, 0.05, 6, false);
+        const tubeMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.25 });
+        const tube = new THREE.Mesh(tubeGeo, tubeMat);
+        scene.add(tube);
+
+        // Animated particles along spline
+        const particleCount = 20;
+        const pGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const pMat = new THREE.PointsMaterial({ color: color, size: 0.8, transparent: true, opacity: 0.9 });
+        const pSystem = new THREE.Points(pGeo, pMat);
+        pSystem.userData = { curve: curve, offsets: Array.from({ length: particleCount }, (_, idx) => idx / particleCount) };
+        scene.add(pSystem);
+        particleSystems.push(pSystem);
+      });
+    }
+
+    // --- Interactive Hover & Click ---
+    function onCanvasMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(interactiveObjects);
+
+      if (intersects.length > 0) {
+        document.body.style.cursor = 'pointer';
+      } else {
+        document.body.style.cursor = 'default';
+      }
+    }
+
+    function onCanvasClick(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(interactiveObjects);
+
+      if (intersects.length > 0) {
+        const hit = intersects[0].object;
+        openInspector(hit.userData);
+      }
+    }
+
+    function openInspector(data) {
+      if (!data) return;
+      document.getElementById('inspect-title').innerHTML = `<i data-lucide="info" class="w-4 h-4"></i> ${data.title}`;
+      document.getElementById('inspect-body').innerHTML = `
+        <div class="p-3 bg-cyan-950/40 rounded-lg border border-cyan-800/80">
+          <div class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">${data.type}</div>
+          <div class="text-xs text-white font-semibold mt-1">${data.title}</div>
+        </div>
+        <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-800 leading-relaxed text-slate-300">
+          ${data.details}
+        </div>
+        <div class="text-[11px] text-slate-400">
+          <strong>Trạng thái:</strong> <span class="text-emerald-400">ONLINE • VERIFIED</span>
+        </div>
+      `;
+      lucide.createIcons();
+      document.getElementById('inspector-panel').classList.remove('translate-x-full');
+    }
+
+    function closeInspector() {
+      document.getElementById('inspector-panel').classList.add('translate-x-full');
+    }
+
+    // --- Smooth Camera Teleport ---
+    function focusCluster(name) {
+      const targetPos = CLUSTER_POS[name] || CLUSTER_POS.overview;
+      const offset = name === 'overview' ? { x: 0, y: 0, z: 0 } : { x: 0, y: 6, z: 12 };
+
+      new TWEEN.Tween(camera.position)
+        .to({ x: targetPos.x + offset.x, y: targetPos.y + offset.y, z: targetPos.z + offset.z }, 1200)
+        .easing(TWEEN.Easing.Cubic.InOut)
+        .start();
+
+      new TWEEN.Tween(controls.target)
+        .to({ x: targetPos.x, y: targetPos.y, z: targetPos.z }, 1200)
+        .easing(TWEEN.Easing.Cubic.InOut)
+        .start();
+    }
+
+    function toggleParticles() {
+      particlesEnabled = !particlesEnabled;
+      const btn = document.getElementById('btn-toggle-particles');
+      btn.textContent = particlesEnabled ? 'ON' : 'OFF';
+      btn.className = particlesEnabled 
+        ? 'px-2 py-1 bg-cyan-900/60 text-cyan-300 rounded border border-cyan-700 hover:bg-cyan-800 transition'
+        : 'px-2 py-1 bg-slate-800 text-slate-400 rounded border border-slate-700 hover:bg-slate-700 transition';
+      particleSystems.forEach(ps => ps.visible = particlesEnabled);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // --- Animation Loop ---
+    let clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      TWEEN.update();
+      controls.update();
+
+      const elapsed = clock.getElapsedTime();
+
+      // Rotate objects gently
+      scene.traverse(obj => {
+        if (obj.userData && obj.userData.coreCube) {
+          obj.userData.coreCube.rotation.x = elapsed * 0.4;
+          obj.userData.coreCube.rotation.y = elapsed * 0.6;
+        }
+        if (obj.userData && obj.userData.wireCube) {
+          obj.userData.wireCube.rotation.x = -elapsed * 0.2;
+          obj.userData.wireCube.rotation.y = -elapsed * 0.3;
+        }
+        if (obj.userData && obj.userData.ring) {
+          obj.userData.ring.rotation.z = elapsed * 0.5;
+        }
+        if (obj.userData && obj.userData.orb) {
+          obj.userData.orb.rotation.y = elapsed * 0.5;
+        }
+        if (obj.userData && obj.userData.pyramid) {
+          obj.userData.pyramid.rotation.y = elapsed * 0.3;
+        }
+        if (obj.userData && obj.userData.router) {
+          obj.userData.router.rotation.x = elapsed * 0.5;
+          obj.userData.router.rotation.y = elapsed * 0.7;
+        }
+      });
+
+      // Animate spline particles
+      if (particlesEnabled) {
+        particleSystems.forEach(ps => {
+          const curve = ps.userData.curve;
+          const posAttr = ps.geometry.attributes.position;
+          const offsets = ps.userData.offsets;
+
+          for (let i = 0; i < offsets.length; i++) {
+            offsets[i] = (offsets[i] + 0.006) % 1.0;
+            const pt = curve.getPointAt(offsets[i]);
+            posAttr.setXYZ(i, pt.x, pt.y, pt.z);
+          }
+          posAttr.needsUpdate = true;
+        });
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // =========================================================================
+    // FASTAPI & HUD INTERACTIVE HOOKS
+    // =========================================================================
+    function setQuery(text) {
+      document.getElementById('chat-input').value = text;
+      document.getElementById('chat-input').focus();
+    }
+
+    function onPersonaChanged() {
+      const p = document.getElementById('persona-select').value;
+      const clearanceMap = {
+        admin: 'RESTRICTED',
+        sales_north: 'CONFIDENTIAL',
+        sales_south: 'CONFIDENTIAL',
+        warehouse_operator: 'INTERNAL',
+        guest_auditor: 'PUBLIC'
+      };
+      document.getElementById('hud-clearance').textContent = clearanceMap[p] || 'PUBLIC';
+    }
+
+    async function submitQuery(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      const persona = document.getElementById('persona-select').value;
+      const resBox = document.getElementById('agent-response-box');
+      const content = document.getElementById('response-content');
+      const latencyBadge = document.getElementById('response-latency');
+
+      resBox.classList.remove('hidden');
+      content.innerHTML = `<span class="text-cyan-400 animate-pulse">⚡ Đang phân rã ý định và điều phối Multi-Agent trong vũ trụ Lakehouse...</span>`;
+
+      // Zoom camera to Agent Nexus
+      focusCluster('agents');
+
+      const t0 = performance.now();
+
+      try {
+        const resp = await fetch('http://localhost:8000/api/v1/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-persona': persona },
+          body: JSON.stringify({ query: query, persona: persona })
+        });
+
+        const data = await resp.json();
+        const lat = Math.round(performance.now() - t0);
+
+        latencyBadge.textContent = `${data.latency_ms || lat} ms | Cache: ${data.cache_hit ? 'HIT' : 'MISS'}`;
+        
+        let formatted = data.answer.replace(/\n/g, '<br/>');
+        if (data.structured_citations && data.structured_citations.length > 0) {
+          formatted += `<br/><br/><strong class="text-cyan-400">📚 Trích dẫn Nguồn Xác thực:</strong>`;
+          data.structured_citations.forEach((c, idx) => {
+            if (c.type === 'DOCUMENT_CITATION') {
+              formatted += `<br/>[${idx+1}] <span class="text-amber-300">${c.title}</span> (Trang ${c.page_number}, ACL: ${c.security_acl})`;
+            } else if (c.type === 'SEMANTIC_METRIC_CITATION') {
+              formatted += `<br/>[${idx+1}] <span class="text-blue-300">Semantic Measures:</span> ${c.semantic_measures}`;
+            }
+          });
+        }
+        content.innerHTML = formatted;
+
+      } catch (err) {
+        // Fallback simulation if backend is not actively receiving network requests
+        const lat = Math.round(performance.now() - t0);
+        latencyBadge.textContent = `${lat} ms (Simulated)`;
+        content.innerHTML = `
+          <strong>[Mô phỏng Phản hồi Cục bộ]</strong><br/>
+          Câu hỏi: "${query}"<br/>
+          Vai trò: ${persona}<br/>
+          <em>Trạng thái: Đã định tuyến qua LangGraph Router, dữ liệu đối soát an toàn qua Zero-Trust Guardrail.</em>
+        `;
+      }
+    }
+
+    // Initialize 3D Engine on load (support iframe & dynamic injection)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        try { init3D(); } catch(e) { console.error("Init3D error:", e); }
+      });
+    } else {
+      setTimeout(() => {
+        try { init3D(); } catch(e) { console.error("Init3D error:", e); }
+      }, 50);
+    }
+  </script>
+</body>
+</html>

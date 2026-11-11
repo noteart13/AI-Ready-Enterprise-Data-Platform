@@ -1,0 +1,34 @@
+cubes:
+  - name: Customers
+    sql_table: dim_customers
+
+    dimensions:
+      - name: customerId
+        sql: customer_id
+        type: string
+        primary_key: true
+
+      - name: companyName
+        sql: company_name
+        type: string
+
+      - name: tier
+        sql: tier
+        type: string
+
+      - name: tenantId
+        sql: tenant_id
+        type: string
+
+      - name: region
+        sql: region
+        type: string
+
+      - name: creditLimit
+        sql: credit_limit
+        type: number
+
+    measures:
+      - name: count
+        type: count
+        title: "Total Customers"

@@ -1,0 +1,84 @@
+cubes:
+  - name: Orders
+    sql_table: fact_orders
+    
+    joins:
+      - name: Customers
+        sql: "{CUBE}.customer_id = {Customers}.customer_id"
+        relationship: many_to_one
+
+    dimensions:
+      - name: orderId
+        sql: order_id
+        type: string
+        primary_key: true
+
+      - name: orderNumber
+        sql: order_number
+        type: string
+
+      - name: customerId
+        sql: customer_id
+        type: string
+
+      - name: tenantId
+        sql: tenant_id
+        type: string
+
+      - name: status
+        sql: status
+        type: string
+
+      - name: orderDate
+        sql: order_date
+        type: time
+
+      - name: orderYearMonth
+        sql: order_year_month
+        type: string
+
+      - name: slaBreached
+        sql: sla_breached
+        type: number
+
+    measures:
+      - name: orderCount
+        type: count
+        title: "Total Orders"
+        description: "Tổng số lượng đơn hàng"
+
+      - name: netRevenue
+        sql: total_amount
+        type: sum
+        title: "Net Revenue"
+        description: "Tổng doanh thu thuần sau chiết khấu"
+
+      - name: grossProfit
+        sql: gross_profit
+        type: sum
+        title: "Gross Profit"
+        description: "Lợi nhuận gộp"
+
+      - name: averageOrderValue
+        sql: total_amount
+        type: avg
+        title: "Average Order Value (AOV)"
+        description: "Giá trị trung bình mỗi đơn hàng"
+
+      - name: avgShippingHours
+        sql: shipping_hours
+        type: avg
+        title: "Average Shipping Hours"
+        description: "Thời gian giao hàng trung bình"
+
+      - name: slaBreachedCount
+        sql: sla_breached
+        type: sum
+        title: "SLA Breached Orders"
+        description: "Số đơn hàng vi phạm cam kết SLA giao hàng"
+
+      - name: slaBreachRate
+        sql: "{slaBreachedCount} * 100.0 / NULLIF({orderCount}, 0)"
+        type: number
+        title: "SLA Breach Rate (%)"
+        description: "Tỷ lệ đơn hàng trễ hạn SLA"
